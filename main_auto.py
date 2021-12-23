@@ -135,7 +135,7 @@ def main():
                     path = select_path + '/labels/'
                     recheck_truckcover(path, '3')  # 映射
                     img_path, labels_p, save_p = select + '/', labels_path + '/', save_path + '/'
-                    result = enhance(img_path, labels_p, save_p)  # 数据增强
+                    enhance(img_path, labels_p, save_p)  # 数据增强
                     ori_img = save_path + '/images'
                     draw_label('3', save_path, ori_img, save_path)  # 绘图
                     save_img = save_path + '/images'
