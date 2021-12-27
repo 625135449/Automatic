@@ -10,8 +10,36 @@ import shutil
 from tqdm import tqdm
 
 def enhance(img_path,labels_path,save_path):
+    """
+    数据增强
+
+    这个功能进行了以下操作(目前是对数据进行2倍数据增强，如果想要多倍，可在enhance.py中更改num的数字)：
+    1. 有白框的图片先沿白框边裁剪1次；在白框到原图边界的的距离范围中随机再次裁剪1次
+    2. 无白框的图片：在所有目标的最小外接矩形到原图边界的的距离范围中随机裁剪2次
+    生成的文件为：
+    1. images(是最终训练所使用的图片，包括原图与增强后的图片，图片名为：'原图名_enhancedi.jpg'，i为随机裁剪的次数(i=1或者i=2))
+    2. labels(是最终训练所使用的标签，包括原图与增强后的标签，标签名为：'原标签名_enhancedi.txt')
+    3. log：记录数据增强函数的日志，内容为:原图名、有无白框判断、裁剪参数(记录随机生成的参数：(0~x的最小值到),(0~y的最小值到),(x的最大值到图片的宽),(Y的最大值到图片的高))
+
+    Parameters
+    ----------
+    images_path : str
+        输入根据关键词合成后的数据集生成的images文件夹的地址
+    label_path : str
+        输入转换好的labels的文件夹地址
+    save_to : str
+        输入数据增强后所有文件的保存地址(包括
+    log_save_to : str
+        输入数据增强后的log文件的保存地址
+
+    Return
+    ------
+    flag : int
+        返回 flag = 0 未进行数据增强或者 flag = 1 进行了数据增强
+    """
     def cut_images(img_path, save_img_path, save_label_path, labels_path, flag,i):
         # 找到白框点
+        result = ''
         res_img_path, res_label_path = '', ''
         xs, ys = dots_cut.point(img_path)  #../1.jpg
         img_oriname = img_path.split('/')[-1]  #1.jpg
