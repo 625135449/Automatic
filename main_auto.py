@@ -114,7 +114,7 @@ def main():
                 selected_operation = int(input_window(img_bg, '请选择方案序号'))
 
                 # project_name2 = project_list1[selected_project_index1 - 1]  # pro/test/test.json_report
-                project_name2 = project_list1[1]  # json_report
+                project_name2 = project_list1[1]  # json_reportfileList
                 # select_path2 = join(select_path, project_name2)
                 # select = join(select_path, project_list1[0])  # images 第一个
                 select_path2 = select_p['json_report']
@@ -135,7 +135,7 @@ def main():
                     path = select_path + '/labels/'
                     recheck_truckcover(path, '3')  # 映射
                     img_path, labels_p, save_p = select + '/', labels_path + '/', save_path + '/'
-                    result = enhance(img_path, labels_p, save_p)  # 数据增强
+                    enhance(img_path, labels_p, save_p)  # 数据增强
                     ori_img = save_path + '/images'
                     draw_label('3', save_path, ori_img, save_path)  # 绘图
                     save_img = save_path + '/images'

@@ -9,7 +9,8 @@ from data import dots_cut
 import shutil
 from tqdm import tqdm
 
-def enhance(img_path,labels_path,save_path):
+
+def enhance(img_path, labels_path, save_path):
     """
     数据增强
 
@@ -37,23 +38,24 @@ def enhance(img_path,labels_path,save_path):
     flag : int
         返回 flag = 0 未进行数据增强或者 flag = 1 进行了数据增强
     """
-    def cut_images(img_path, save_img_path, save_label_path, labels_path, flag,i):
+
+    def cut_images(img_path, save_img_path, save_label_path, labels_path, flag, i):  # ./images/
         # 找到白框点
         result = ''
         res_img_path, res_label_path = '', ''
-        xs, ys = dots_cut.point(img_path)  #../1.jpg
-        img_oriname = img_path.split('/')[-1]  #1.jpg
+        xs, ys = dots_cut.point(img_path)  # ../1.jpg
+        img_oriname = img_path.split('/')[-1]  # 1.jpg
         img_name = os.path.splitext(img_oriname)[0]
-        save_filename = img_name + '_enhanced' + str(i+1)
+        save_filename = img_name + '_enhanced' + str(i + 1)
         uuid_ = uuid.uuid4()
         # print(xs, ys)
 
         if -1 in xs or -1 in ys:
             # print('无白框')
             # 原图无白框，随机裁取
-            l = read_label(labels_path) #以元组返回((x_small,x/w), (y_small,y/h), (x_big,x/w), (y_big,y/h), line_list)
+            l = read_label(labels_path)  # 以元组返回((x_small,x/w), (y_small,y/h), (x_big,x/w), (y_big,y/h), line_list)
             # print(labels_path,l)
-            img = cv2.imread(img_path, 1) #三通道
+            img = cv2.imread(img_path, 1)  # 三通道
             # 存入图片
             # name = str(uuid_)
             name = save_filename
@@ -73,7 +75,9 @@ def enhance(img_path,labels_path,save_path):
                 # label为空
                 # name = str(uuid_)
                 result = dots_cut.cut(name + '.jpg', img_path, xs, ys, save_img_path)
-                open(save_label_path + name + '.txt', "w")
+                # open(save_label_path + name + '.txt', "w")
+                with open(os.path.join(save_label_path, f"{name}{'.txt'}"), "w") as f:
+                    f.write('')
                 res_img_path = save_img_path + name + '.jpg'
                 res_label_path = save_label_path + name + '.txt'
                 flag = 1
@@ -108,10 +112,9 @@ def enhance(img_path,labels_path,save_path):
                     res_label_path = save_label_path + name + '.txt'
                     flag = 1
 
-        return res_img_path, res_label_path, flag,result
+        return res_img_path, res_label_path, flag, result
         # except Exception as e:
         #     print(e)
-
 
     def choose_num(num, img_path, labels_path, save_path):
         save_img_path = save_path + 'images/'
@@ -125,14 +128,15 @@ def enhance(img_path,labels_path,save_path):
                 flag = 0
 
                 shutil.copy(os.path.join(root, file), os.path.join(save_img_path, file))  # 复制原图
-                shutil.copy(os.path.join(labels_path, file[:-4] + '.txt'),os.path.join(save_label_path, file[:-4] + '.txt'))  # 复制标签
+                shutil.copy(os.path.join(labels_path, file[:-4] + '.txt'),
+                            os.path.join(save_label_path, file[:-4] + '.txt'))  # 复制标签
 
                 res_img_path, res_label_path = '', ''
                 for i in range(num):
                     if '.jpg' in file:
                         img_path_ = os.path.join(root, file)
                         labels_path_ = os.path.join(labels_path, file[:-4] + '.txt')
-                        ori_img = '原图：'+ file
+                        ori_img = '原图：' + file
                         logging.critical(ori_img)
                         if res_img_path != '' or res_label_path != '':
                             # print(res_img_path, res_label_path)
@@ -145,25 +149,28 @@ def enhance(img_path,labels_path,save_path):
                             # logging.critical(res_label_path)
                         # print(file)
 
-
                         # print(flag)
                         # logging.critical(flag)
-                        if flag == 0: #无白框
-                            opt = '无白框'+ str(flag)
+                        if flag == 0:  # 无白框
+                            opt = '无白框' + str(flag)
                             logging.critical(opt)
-                            res_img_path, res_label_path, flag ,result= cut_images(img_path_, save_img_path, save_label_path,
-                                                                            labels_path_, flag,i)
-                            save_result = '裁剪参数((x_small,随机0~x_samll),(y_small,随机0~y_samll),(x_max,随机x_max~w),(y_max,随机y_max~h)):'+str(result)
+                            res_img_path, res_label_path, flag, result = cut_images(img_path_, save_img_path,
+                                                                                    save_label_path,
+                                                                                    labels_path_, flag, i)
+                            save_result = '裁剪参数((x_small,随机0~x_samll),(y_small,随机0~y_samll),(x_max,随机x_max~w),(y_max,随机y_max~h)):' + str(
+                                result)
                             logging.critical(save_result)
                         elif flag == 1:
                             opt = '有白框' + str(flag)
                             logging.critical(opt)
-                            res_img_path, res_label_path, flag ,result= cut_images(res_img_path, save_img_path, save_label_path,
-                                                                            res_label_path, flag,i)
-                            save_result = '裁剪参数((x_small,随机0~x_samll),(y_small,随机0~y_samll),(x_max,随机x_max~w),(y_max,随机y_max~h)):' + str(result)
+                            res_img_path, res_label_path, flag, result = cut_images(res_img_path, save_img_path,
+                                                                                    save_label_path,
+                                                                                    res_label_path, flag, i)
+                            save_result = '裁剪参数((x_small,随机0~x_samll),(y_small,随机0~y_samll),(x_max,随机x_max~w),(y_max,随机y_max~h)):' + str(
+                                result)
                             logging.critical(save_result)
 
-# if __name__ == "__main__":
+    # if __name__ == "__main__":
     # parser = argparse.ArgumentParser(description='Personal information')
     # parser.add_argument('--img_path', dest='img_path', type=str)
     # parser.add_argument('--labels_path', dest='labels_path', type=str)
@@ -195,7 +202,6 @@ def enhance(img_path,labels_path,save_path):
     if not os.path.exists(save_path):
         os.mkdir(save_path)
     choose_num(num, img_path, labels_path, save_path)
-
 
 # save_path = '/media/vs/qi/data/test2/test/images_save/'
 # if os.path.exists(save_path):

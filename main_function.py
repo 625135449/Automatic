@@ -1,4 +1,3 @@
-import os
 from os.path import join
 import multiprocessing as mp
 from data.shuffle import make_test
@@ -7,20 +6,16 @@ from data.todarknet_json import json_reverse
 from data.draw import draw_label
 from data.enhance import enhance
 from data.data_arg import arg
-from tqdm import tqdm
-from time import sleep
-from data.salt import salt
 import os
 import cv2
 from data.puttext import puttext
-import random
 from tqdm import tqdm
 from time import sleep
 
 img_bg = None
 
 
-def input_window(img, msg, color='blue'):
+def input_window(msg):
     print(msg)
     return input('>')
 
@@ -43,7 +38,7 @@ def main():
             print('[%d] %s' % (i + 1, p))
         selected_project_index = -1
         while not (0 < selected_project_index <= len(project_list)):
-            selected_project_index = int(input_window(img_bg, 'Select one project'))
+            selected_project_index = int(input_window('Select one project'))
 
             project_name = project_list[selected_project_index - 1]
             select_path = join('project', project_name)
@@ -53,9 +48,9 @@ def main():
             for r, d, f in os.walk(select_path):
                 for i in d:
                     if os.path.isdir(join(r, i)):
-                        Img_path = join(r, i)
+                        ori_img_path = join(r, i)
                         if not os.path.exists(join(r, 'images')):
-                            os.rename(Img_path, join(r, 'images'))
+                            os.rename(ori_img_path, join(r, 'images'))
                         else:
                             break
 
@@ -76,9 +71,9 @@ def main():
                     print('[%d] %s' % (i + 1, p))
 
             selected_project_index1 = -1
-            flag = 0
+            flag = 0  # 初始状态
             while not (0 < selected_project_index1 <= len(project_list)):
-                selected_project_index1 = int(input_window(img_bg, 'Select one project'))
+                selected_project_index1 = int(input_window('Select one project'))
             selected_operation1 = 0
             while selected_operation1 >= 0:
                 print('--------功能菜单--------')
@@ -91,17 +86,17 @@ def main():
                 print('[7] 绘制图片')
                 print('[8] 制作测试集')
                 print('[0] 退出')
-                selected_operation = int(input_window(img_bg, 'What do you want to do?'))
+                selected_operation = int(input_window('What do you want to do?'))
                 project_name2 = project_list1[selected_project_index1 - 1]  # pro/test/test.json_report
                 select_path2 = join(select_path, project_name2)
-                # select = join(select_path, project_list1[0])  # images 第一个
                 select = join(select_path, 'images')
-                fileList = os.listdir(select_path)  # 读取所有文件
+                file_list = os.listdir(select_path)  # 读取所有文件
+
                 # save function
-                labels_path = select_path + '/labels'
-                save_path = select_path + '/save'
+                labels_path = f"{select_path}{'/labels'}"
+                save_path = f"{select_path}{'/save'}"
                 pic = []
-                for p in fileList:
+                for p in file_list:
                     pic.append(p)
                 pic_len = len(pic)
                 if selected_operation == 0:
@@ -113,35 +108,40 @@ def main():
                 if selected_operation == 3:
                     helmet_reverse(select_path2, select_path)
                 if selected_operation == 4:
-                    num = input(
-                        '1:GDT_truck 2:close_transportation 3:GDT_helmet 4:helmet 5:GDT_fire 6:GDT_glitter 7:GDT_improper_glitter (selecte the num) 8:Helmet_Glitter(Helmet) 9:CLT(30类） 10:广联达CLT 11：FGH(反光衣)')
-                    path = select_path + '/labels/'
+                    num = input('1:GDT_truck 2:close_transportation 3:GDT_helmet 4:helmet 5:GDT_fire 6:GDT_glitter '
+                                '7:GDT_improper_glitter (selecte the num) 8:Helmet_Glitter(Helmet) 9:CLT(30类） '
+                                '10:广联达CLT 11：FGH(反光衣)')
+                    path = f"{select_path}{'/labels/'}"
                     recheck_truckcover(path, num)
                 if selected_operation == 5:
-                    img_path = select + '/'
-                    labels_p = labels_path + '/'
-                    save_p = save_path + '/'
+                    img_path = f"{select}{'/'}"
+                    labels_p = f"{labels_path}{'/'}"
+                    save_p = f"{save_path}{'/'}"
                     enhance(img_path, labels_p, save_p)
-                    flag = 1
+                    flag = 1  # 增强
                 if selected_operation == 6:
-                    # labels_path = select_path + '/labels'
-                    # save_path = select_path + '/save'
-                    save_img = save_path + '/images'
-                    save_lb = save_path + '/labels'
                     arg(select, labels_path, save_path)
                     # salt(select_path,save_img,save_lb)
                     flag = 1
                 if selected_operation == 7:
                     option = input('1：绘制全部图片 2：随机绘制十张图片:')
-                    num = input(
-                        '1:GDT_truck 2:close_transportation 3:helmet 4:fire 5:glitter 6:mask 7:improper glitter 8:Helmet_Glitter(helmet and glitter) 9:CLT 10:烟:11:人')
+                    num = input('1:GDT_truck 2:close_transportation 3:helmet 4:fire 5:glitter 6:mask '
+                                '7:improper glitter 8:Helmet_Glitter(helmet and glitter) 9:CLT 10:烟:11:人')
                     # draw_label(num, select, select_path)
-                    if flag == 1 and option == '2':
-                        ori_img = save_path + '/images'
+                    if flag == 1 and option == '2':  # 绘制增强的10张图片
+                        ori_img = f"{save_path}{'/images'}"
                         draw_label(num, save_path, ori_img, save_path)
-                        flag = 2
-                    else:
-                        # draw_label(num, select_path, select, select_path)  # ori_img,save_ori
+                        flag = 1
+
+                    elif flag == 1 and option == '1':  # 绘制增强的全部图片
+                        ori_img = f"{save_path}{'/images'}"
+                        draw(num, save_path, ori_img, save_path)
+                        flag = 1
+
+                    elif flag == 0 and option == '2':  # 绘制未增强的10张图片
+                        draw_label(num, select_path, select, select_path)
+                        flag = 0
+                    else:  # 绘制未增强的全部图片
                         draw(num, select_path, select, select_path)  # ori_img,save_ori
                         flag = 0
                 if selected_operation == 8:
@@ -177,7 +177,7 @@ def check_project(select_path):
 
     selected_project_index1 = -1
     while not (0 < selected_project_index1 <= len(project_list3)):
-        selected_project_index1 = int(input_window(img_bg, 'Select one project'))
+        selected_project_index1 = int(input_window('Select one project'))
         project_name2 = project_list3[selected_project_index1 - 1]
         select_path2 = join(select_path, project_name2)
         file_list5 = os.listdir(select_path2)  # 读取所有文件
@@ -204,12 +204,12 @@ def recheck_truckcover(path, num):
     for _, _, files in os.walk(path):
         for f in tqdm(files):
             txt_path = os.path.join(path, f)
-            with open(txt_path, "r") as f:
-                lines = f.readlines()
+            with open(txt_path, "r") as file:
+                lines = file.readlines()
             result = []
             for i in lines:
                 if num == '1':  # GDT_truck
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '0':
                         result.append("2" + i[1:])
@@ -222,7 +222,7 @@ def recheck_truckcover(path, num):
                     elif i[0] == '3':
                         result.append("4" + i[1:])
                 if num == '2':  # truck
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '0':
                         result.append("0" + i[1:])
@@ -237,7 +237,7 @@ def recheck_truckcover(path, num):
                     elif i[0] == '5':
                         result.append("4" + i[1:])
                 if num == '3':  # GDT_helmet
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     # if i[1].isdigit():
                     #     continue
@@ -245,30 +245,30 @@ def recheck_truckcover(path, num):
                         result.append("1" + i[1:])
                     if i[0] == '5':  # no helmet
                         result.append("0" + i[1:])
-                    if i[0] == '1' and i[1] == '4':  #骑摩托车
+                    if i[0] == '1' and i[1] == '4':  # 骑摩托车
                         result.append("1" + i[2:])
-                    if i[0] == '1' and i[1] == '5':  #保安
+                    if i[0] == '1' and i[1] == '5':  # 保安
                         result.append("0" + i[2:])
-                    if i[0] == '1' and i[1] == '6':  #帽子
+                    if i[0] == '1' and i[1] == '6':  # 帽子
                         result.append("0" + i[2:])
-                    if i[0] == '1' and i[1] == '7':  #改造
+                    if i[0] == '1' and i[1] == '7':  # 改造
                         result.append("0" + i[2:])
                 if num == '4':  # helmet
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '0':
                         result.append("1" + i[1:])
                     if i[0] == '1':
                         result.append("0" + i[1:])
                 if num == '5':  # GDT_fire
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[1].isdigit():
                         continue
                     if i[0] == '6':
                         result.append("0" + i[1:])
                 if num == '6':  # GDT_glitter
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '9':
                         result.append("0" + i[1:])
@@ -279,7 +279,7 @@ def recheck_truckcover(path, num):
                     if i[1].isdigit():
                         continue
                 if num == '7':  # GDT_glitter_new
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '9':
                         result.append("0" + i[1:])
@@ -290,39 +290,24 @@ def recheck_truckcover(path, num):
                     if i[1].isdigit():
                         continue
                 if num == '8':  # Helmet_Glitter   helmet
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '0':
                         result.append("0" + i[1:])
                     elif i[0] == '1':
                         result.append("1" + i[1:])
                 if num == '9':  # Helmet_Glitter   glitter
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '2':  # no wear
                         result.append("1" + i[1:])
                     elif i[0] == '3':
                         result.append("0" + i[1:])
                 if num == '10':  # GDT_truck
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '3':
                         result.append("0" + i[1:])
-                    # elif i[1].isdigit():
-                    #     continue
-                    elif i[0] == '1' and i[1] == '4':
-                        result.append("1" + i[2:])
-                    elif i[0] == '1' and i[1] == '5':
-                        result.append("2" + i[2:])
-                    elif i[0] == '1' and i[1] == '6':
-                        result.append("3" + i[2:])
-                if num == '10':  # GDT_truck
-                    if i[0] == None:
-                        result.append(None)
-                    if i[0] == '3':
-                        result.append("0" + i[1:])
-                    # elif i[1].isdigit():
-                    #     continue
                     elif i[0] == '1' and i[1] == '4':
                         result.append("1" + i[2:])
                     elif i[0] == '1' and i[1] == '5':
@@ -330,7 +315,7 @@ def recheck_truckcover(path, num):
                     elif i[0] == '1' and i[1] == '6':
                         result.append("3" + i[2:])
                 if num == '11':  # GDT_glitter
-                    if i[0] == None:
+                    if i[0] is None:
                         result.append(None)
                     if i[0] == '6':
                         result.append("0" + i[1:])
@@ -345,13 +330,8 @@ def recheck_truckcover(path, num):
 
 
 def draw(num, path, ori_img, save_path):
-    # path = input('input label path(../labels):')                  #"/media/vs/Data/darknet_train_result/Truck0406/labels2"  #label address
-    # path1 = input('input images path(../images):')                # "/media/vs/Data/darknet_train_result/Truck0406/Truck0406"  #pictures address
-    # path2 = input('input drawed iamges path(../val_images):')      #"/media/vs/Data/darknet_train_result/Truck0406/test"   #drawed pictures address
-
     path = path + '/labels'
     path1 = ori_img
-    # path1 = ori_img + '/images'
     path2 = save_path + '/val'
     if not os.path.exists(path2):
         os.makedirs(path2)
@@ -360,14 +340,14 @@ def draw(num, path, ori_img, save_path):
         # result = random.sample(files, 10)
         for name in tqdm(files):
             if name.endswith(".txt"):
-                filename = root + "/" + name  # /media/wst/Data/darknet训练结果/darknet训练结果/TruckCover/darknet_275_closetransportation/train/labels/31801994.txt
+                filename = root + "/" + name  # /media/wst/Data/train/labels/31801994.txt
                 file_name = name.split('.')[0]  # name = 31801994.txt      file_name = 31801994
                 file_path = path1 + "/" + file_name + ".jpg"  # label对应的图片
                 img = cv2.imread(file_path)  # 读入图片
                 h, w = img.shape[:2]
                 f = open(filename, "r")
                 for each_line in f:
-                    each_line_list = each_line.split()  # 将每一行的数字分开放在列表中   1 0.858911 0.570299 0.276238 0.314587   类别，中心点，宽比，高比
+                    each_line_list = each_line.split()  # 将每一行的数字分开放在列表中 类别，中心点，宽比，高比
                     xmin = (float(each_line_list[1]) - (1 / 2) * (float(each_line_list[3]))) * w
                     ymin = (float(each_line_list[2]) - (1 / 2) * (float(each_line_list[4]))) * h
                     xmax = (float(each_line_list[1]) + (1 / 2) * (float(each_line_list[3]))) * w
@@ -375,7 +355,7 @@ def draw(num, path, ori_img, save_path):
 
                     cls = str(each_line_list[0])
                     c1, c2 = (int(xmin), int(ymin)), (int(xmax), int(ymax))
-                    #####test   bgr
+
                     if num == '1':  # GDT_TRUCK
                         if cls == '1':  # close
                             cv2.rectangle(img, c1, c2, (128, 0, 0), 2)
@@ -571,8 +551,7 @@ def draw(num, path, ori_img, save_path):
                             cv2.rectangle(img, c1, c2, (0, 0, 192), 2)
                             img = puttext(img, '人', (c1), (0, 0, 192), 20, 'yuyang.ttf', "BL")
 
-
-                cv2.imwrite(path2 + "/" + file_name + ".jpg", img)
+                cv2.imwrite(f"{path2}{'/'}{file_name}{'.jpg'}", img)
                 f.close()
     sleep(0.2)
     print('绘制图片完成')

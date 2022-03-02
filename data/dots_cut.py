@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import random
+import os
 
 
 def point(img):
@@ -54,11 +55,14 @@ def point(img):
             if len(x_list) == 0:
                 vote_dict[x_value] = 1
             else:
-                diff = min(np.abs(np.array(x_list) - x_value))
-                if diff > 5:
-                    vote_dict[x_value] = 1
-                else:
-                    vote_dict[x_value] += 1
+                try:
+                    diff = min(np.abs(np.array(x_list) - x_value))
+                    if diff > 5:
+                        vote_dict[x_value] = 1
+                    else:
+                        vote_dict[x_value] += 1
+                except KeyError:
+                    continue
         return vote_dict
 
     def find_two(d):
@@ -106,7 +110,10 @@ def cut_(l, img, save_path, img_file, save_label_path):
         if ys0 < ys1 and xs0 < xs1:
             newimg = img[ys0:ys1, xs0:xs1]
             cv.imwrite(save_path + img_file + '.jpg', newimg)
-            open(save_label_path + img_file + '.txt', "w")
+
+            with open(os.path.join(save_label_path, f"{img_file}{'.txt'}"), "w") as f:
+                f.write('')
+            # open(save_label_path + img_file + '.txt', "w")
     else:
         # label 中心点（l0,l1）宽 l3 长：l2
         l0, l1, l2, l3 = float(l[0][0]), float(l[1][0]), float(l[2][0]), float(l[3][0])   #x_s,y_s,x_b,y_b
