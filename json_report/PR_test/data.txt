@@ -1,0 +1,5 @@
+classes = 2
+train  = /home/xunjie/Desktop/darknet/helmet/data/train.list
+valid  = /media/vs/Data/aist/darknet/PR/valid.list
+names = /media/vs/Data/aist/json_report/PR_test/name.txt
+backup = /home/xunjie/Desktop/darknet/helmet/weights/

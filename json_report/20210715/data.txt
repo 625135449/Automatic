@@ -1,0 +1,5 @@
+classes = 2
+train  = /home/xunjie/Desktop/darknet/helmet/data/train.list
+valid  = /media/vs/Data/aist/project/20210805/save/valid.list
+names = /media/vs/Data/darknet_train_result/darknet/Helmet/helmet_new/Tiny/model/20210715/name.txt
+backup = /home/xunjie/Desktop/darknet/helmet/weights/

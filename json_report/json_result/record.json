@@ -1,0 +1,11 @@
+{
+    "map": {
+        "name = no helmet": "ap = 53.09%",
+        "name = wear helmet": "ap = 46.75%"
+    },
+    "label_count": {
+        "wear helmet": 3,
+        "no helmet": 3
+    },
+    "PR_img": []
+}
