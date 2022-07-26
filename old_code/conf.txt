@@ -1,0 +1,7 @@
+1,空闲,empty
+2,托盘,tray
+3,有货,material
+4,垃圾车,scrap
+5,变动,move
+6,人物,person
+0,不确定,unsure
