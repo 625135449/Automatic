@@ -17,7 +17,7 @@ def make_test(path, img_path):
     label_path = f"{path}{'/labels'}"
 
     for _, _, files in os.walk(img_path):
-        num = int(0.1 * len(files))
+        num = int(0.2 * len(files))
         result = random.sample(files, num)
         for r in result:
             shutil.move(os.path.join(img_path, r), os.path.join(shuffle_img_path, r))
@@ -40,4 +40,4 @@ def make_test(path, img_path):
             shutil.move(os.path.join(label_path, remain_label), os.path.join(shuffle_lb_path, remain_label))
     print('测试集制作完成')
 
-# make_test('/media/vs/Data/aist/project/glitter0723_2/save', '/media/vs/Data/aist/project/glitter0723_2/save/images')
+# make_test('/media/vs/qi/data/GLD/VOC2022/0629train_alldata', '/media/vs/qi/data/GLD/VOC2022/0629train_alldata/images')

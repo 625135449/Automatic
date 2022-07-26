@@ -3,13 +3,14 @@ import os
 from tqdm import tqdm
 from time import sleep
 
-def json_reverse(pic_len,j_path,path):
+
+def json_reverse(pic_len, j_path, path):
     # json_path = input('input json_report path(../example.json_report):')                       #'/media/vs/Data/darknet_train_result/Truck0406/Truck0406.json_report'
     # label_path = input('input labels saved path(../labels/):')                       #'/media/vs/Data/darknet_train_result/Truck0406/labels2/'
     # train_path = os.path.join(label_path + '/' + 'train.txt')                        # r'/media/vs/Data/darknet_train_result/Truck0406/labels2/train.txt'  # 转换成的train保存路径
 
     json_path = j_path
-    label_path = path + '/' +'labels/'
+    label_path = path + '/' + 'labels/'
     train_path = os.path.join(label_path + '/' + 'train.txt')
 
     if os.path.exists(train_path):
@@ -80,7 +81,7 @@ def json_reverse(pic_len,j_path,path):
                                 name = str(j) + ' ' + x1 + ' ' + y1 + ' ' + x + ' ' + y + '\n'
                                 file3.write(name)
             else:
-                k=''
+                k = ''
                 file3.write(k)
                 file3.close()
         except TypeError:
@@ -90,3 +91,7 @@ def json_reverse(pic_len,j_path,path):
     file2.close()
     os.remove(train_path)
     print('制作标签完成')
+
+
+# json_reverse(2, '/media/vs/qi/data/CLT34/OLD/Data/base2/20220510101836_CLT.json',
+#              '/media/vs/qi/data/CLT34/OLD/Data/base2')
